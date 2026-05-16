@@ -1,0 +1,39 @@
+[project]
+name = "nonebot-plugin-custom-welcome"
+version = "0.1.0"
+description = "NoneBot2 自定义加群欢迎插件"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "TonyLiangP2010405", email = "your@email.com" }
+]
+keywords = ["nonebot", "nonebot2", "plugin", "welcome", "onebot"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "nonebot2>=2.2.0",
+    "nonebot-adapter-onebot>=2.4.0",
+    "httpx>=0.24.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/TonyLiangP2010405/nonebot-plugin-custom-welcome"
+Repository = "https://github.com/TonyLiangP2010405/nonebot-plugin-custom-welcome"
+
+[project.entry-points."nonebot.plugins"]
+nonebot_plugin_custom_welcome = "nonebot_plugin_custom_welcome"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nonebot_plugin_custom_welcome"]

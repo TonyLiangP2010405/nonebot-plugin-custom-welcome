@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile nonebot_plugin_custom_welcome/config.py nonebot_plugin_custom_welcome/data.py nonebot_plugin_custom_welcome/utils.py nonebot_plugin_custom_welcome/__init__.py)",
+      "Bash(pip list *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import nonebug; print\\(dir\\(nonebug\\)\\)\")",
+      "Bash(python -c \"from nonebug import App; import inspect; print\\(inspect.signature\\(App.test_matcher\\)\\)\")",
+      "Bash(python *)"
+    ]
+  }
+}
