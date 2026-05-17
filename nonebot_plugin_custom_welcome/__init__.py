@@ -16,10 +16,12 @@ from nonebot.rule import event_type
 
 from .config import Config
 from .data import (
+    clear_group_rules,
     clear_group_welcome,
     get_group_image_dir,
     get_group_welcome,
     set_group_image,
+    set_group_rules,
     set_group_text,
 )
 from .utils import (
@@ -74,6 +76,11 @@ async def handle_group_increase(bot: Bot, event: GroupIncreaseNoticeEvent):
         image_path = welcome.get("image")
         msg = build_welcome_message(user_id, text, image_path)
         await group_increase.send(msg)
+        # 如果有群规，紧接着发群规
+        rules = welcome.get("rules")
+        if rules:
+            await asyncio.sleep(random.uniform(0.8, 1.5))
+            await group_increase.send(MessageSegment.text(rules))
     else:
         # 默认欢迎
         msg = MessageSegment.at(user_id) + MessageSegment.text(f"\n{plugin_config.custom_welcome_default_text}")
@@ -196,3 +203,71 @@ async def handle_clear_welcome(bot: Bot, event: GroupMessageEvent, matcher: Matc
         await matcher.finish("该群没有设置欢迎消息。")
 
     await matcher.finish("已清除当前群的欢迎设置。")
+
+
+# ==================== 命令：设置群规 ====================
+
+set_rules_cmd = on_command("设置群规", aliases={"设置群规则"}, priority=5, block=True)
+
+
+@set_rules_cmd.handle()
+async def handle_set_rules(bot: Bot, event: GroupMessageEvent, matcher: Matcher, args=CommandArg()):
+    # 必须在群聊中使用
+    if event.message_type != "group":
+        return
+
+    # 权限检查
+    if not await check_permission(bot, event):
+        await matcher.finish("只有群主或管理员可以设置群规哦~")
+
+    text = args.extract_plain_text().strip()
+    if not text:
+        await matcher.finish("请提供群规文案，例如：#设置群规 本群禁止发广告，违者踢出~")
+
+    group_id = str(event.group_id)
+    set_group_rules(group_id, text)
+    await matcher.finish(f"群规设置成功：\n{text}")
+
+
+# ==================== 命令：查看群规 ====================
+
+view_rules_cmd = on_command("查看群规", aliases={"群规"}, priority=5, block=True)
+
+
+@view_rules_cmd.handle()
+async def handle_view_rules(event: GroupMessageEvent, matcher: Matcher):
+    # 必须在群聊中使用
+    if event.message_type != "group":
+        return
+
+    group_id = str(event.group_id)
+    welcome = get_group_welcome(group_id)
+
+    if not welcome or not welcome.get("rules"):
+        await matcher.finish("该群尚未设置群规。")
+
+    await matcher.finish(f"📋 当前群规：\n{welcome['rules']}")
+
+
+# ==================== 命令：清除群规 ====================
+
+clear_rules_cmd = on_command("清除群规", priority=5, block=True)
+
+
+@clear_rules_cmd.handle()
+async def handle_clear_rules(bot: Bot, event: GroupMessageEvent, matcher: Matcher):
+    # 必须在群聊中使用
+    if event.message_type != "group":
+        return
+
+    # 权限检查
+    if not await check_permission(bot, event):
+        await matcher.finish("只有群主或管理员可以设置群规哦~")
+
+    group_id = str(event.group_id)
+    had_rules = clear_group_rules(group_id)
+
+    if not had_rules:
+        await matcher.finish("该群没有设置群规。")
+
+    await matcher.finish("已清除当前群的群规。")

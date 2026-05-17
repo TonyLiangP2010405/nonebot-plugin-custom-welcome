@@ -111,6 +111,30 @@ def clear_group_welcome(group_id: str) -> bool:
     return True
 
 
+def set_group_rules(group_id: str, text: str):
+    """设置指定群的群规文案"""
+    config = load_config()
+    group_id = str(group_id)
+    if group_id not in config:
+        config[group_id] = {}
+    config[group_id]["rules"] = text
+    save_config(config)
+
+
+def clear_group_rules(group_id: str) -> bool:
+    """清除指定群的群规，返回是否清除了内容"""
+    config = load_config()
+    group_id = str(group_id)
+    if group_id not in config or "rules" not in config[group_id]:
+        return False
+    del config[group_id]["rules"]
+    # 如果群配置空了则删除该群条目
+    if not config[group_id]:
+        del config[group_id]
+    save_config(config)
+    return True
+
+
 def get_group_image_dir(group_id: str) -> Path:
     """获取指定群的图片目录"""
     dir_path = IMAGE_DIR / str(group_id)
