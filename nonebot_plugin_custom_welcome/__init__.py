@@ -1,18 +1,16 @@
 import asyncio
 import random
 
-from nonebot import get_driver, on_command, on_notice
+from nonebot import get_plugin_config, on_command, on_notice, logger
 from nonebot.adapters.onebot.v11 import (
     Bot,
     GroupIncreaseNoticeEvent,
     GroupMessageEvent,
     MessageSegment,
 )
-from nonebot.log import logger
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
-from nonebot.rule import event_type
 
 from .config import Config
 from .data import (
@@ -32,23 +30,22 @@ from .utils import (
     is_cooldown,
 )
 
-# 插件元数据（NoneBot2 官方推荐方式）
-__plugin_meta__ = PluginMetadata(
-    name="custom_welcome",
-    description="自定义加群欢迎插件",
-    usage="#设置欢迎文案、#设置欢迎图片、#查看欢迎、#清除欢迎",
-)
+plugin_config = get_plugin_config(Config)
 
-# 全局配置解析（Pydantic v2 兼容）
-global_config = get_driver().config
-plugin_config = Config.model_validate(
-    {k: getattr(global_config, k) for k in Config.model_fields if hasattr(global_config, k)}
+__plugin_meta__ = PluginMetadata(
+    name="自定义加群欢迎",
+    description="自定义加群欢迎插件，支持设置欢迎文案、图片和群规",
+    usage="#设置欢迎文案、#设置欢迎图片、#查看欢迎、#清除欢迎、#设置群规、#查看群规、#清除群规",
+    type="application",
+    homepage="https://github.com/TonyLiangP2010405/nonebot-plugin-custom-welcome",
+    config=Config,
+    supported_adapters={"~onebot.v11"},
 )
 
 
 # ==================== 事件监听：新人入群 ====================
 
-group_increase = on_notice(rule=event_type("group_increase"), priority=5)
+group_increase = on_notice(priority=5)
 
 
 @group_increase.handle()

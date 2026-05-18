@@ -3,11 +3,9 @@ from pathlib import Path
 from typing import Optional
 
 import httpx
+from nonebot import logger
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
-from nonebot.log import logger
 from nonebot.permission import SUPERUSER
-
-from .data import get_group_image_dir
 
 # 群防重复记录: {group_id: last_trigger_time}
 _welcome_cooldown: dict = {}
@@ -39,6 +37,10 @@ def extract_image_url(message: Message) -> Optional[str]:
             url = seg.data.get("url")
             if url:
                 return url
+            # 某些适配器会把 URL 放在 file 字段
+            file_ = seg.data.get("file")
+            if file_ and (file_.startswith("http://") or file_.startswith("https://")):
+                return file_
     return None
 
 

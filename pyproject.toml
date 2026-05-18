@@ -1,22 +1,23 @@
 [project]
 name = "nonebot-plugin-custom-welcome"
-version = "0.2.0"
+version = "0.2.1"
 description = "NoneBot2 自定义加群欢迎插件"
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
-    { name = "TonyLiangP2010405", email = "your@email.com" }
+    { name = "Tony" },
 ]
 keywords = ["nonebot", "nonebot2", "plugin", "welcome", "onebot"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: Chat",
 ]
 dependencies = [
     "nonebot2>=2.2.0",
@@ -28,8 +29,14 @@ dependencies = [
 Homepage = "https://github.com/TonyLiangP2010405/nonebot-plugin-custom-welcome"
 Repository = "https://github.com/TonyLiangP2010405/nonebot-plugin-custom-welcome"
 
-[project.entry-points."nonebot.plugins"]
+[project.entry-points."nonebot.plugin"]
 nonebot_plugin_custom_welcome = "nonebot_plugin_custom_welcome"
+
+[tool.nonebot]
+plugins = ["nonebot_plugin_custom_welcome"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 requires = ["hatchling"]
@@ -37,3 +44,4 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["nonebot_plugin_custom_welcome"]
+

@@ -4,16 +4,11 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from nonebot import get_driver
-from nonebot.log import logger
+from nonebot import get_plugin_config, logger
 
 from .config import Config
 
-# 安全地从全局配置中提取插件需要的字段（Pydantic v2 兼容）
-global_config = get_driver().config
-plugin_config = Config.model_validate(
-    {k: getattr(global_config, k) for k in Config.model_fields if hasattr(global_config, k)}
-)
+plugin_config = get_plugin_config(Config)
 
 # 数据目录（在 NoneBot 启动时基于当前工作目录解析为绝对路径）
 DATA_DIR = Path(plugin_config.custom_welcome_data_dir).resolve()

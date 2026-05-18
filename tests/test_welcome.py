@@ -136,28 +136,29 @@ class TestMatchers:
     """使用 NoneBug 测试 matcher"""
 
     @pytest.mark.asyncio
-    async def test_default_welcome(self, app: App):
+    async def test_default_welcome(self, app: App, tmp_path):
         """测试新人入群默认欢迎"""
-        async with app.test_matcher(group_increase) as ctx:
-            adapter = ctx.create_adapter(base=Adapter)
-            bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
-            event = GroupIncreaseNoticeEvent(
-                time=int(time.time()),
-                self_id=1,
-                post_type="notice",
-                notice_type="group_increase",
-                sub_type="approve",
-                user_id=12345,
-                group_id=10086,
-                operator_id=0,
-            )
-            ctx.receive_event(bot, event)
-            ctx.should_call_send(
-                event,
-                Message(MessageSegment.at(12345) + MessageSegment.text("\n欢迎新人~！")),
-                result=None,
-                bot=bot,
-            )
+        with patch("nonebot_plugin_custom_welcome.data.CONFIG_FILE", tmp_path / "welcome.json"):
+            async with app.test_matcher(group_increase) as ctx:
+                adapter = ctx.create_adapter(base=Adapter)
+                bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
+                event = GroupIncreaseNoticeEvent(
+                    time=int(time.time()),
+                    self_id=1,
+                    post_type="notice",
+                    notice_type="group_increase",
+                    sub_type="approve",
+                    user_id=12345,
+                    group_id=10086,
+                    operator_id=0,
+                )
+                ctx.receive_event(bot, event)
+                ctx.should_call_send(
+                    event,
+                    Message(MessageSegment.at(12345) + MessageSegment.text("\n欢迎新人~！")),
+                    result=None,
+                    bot=bot,
+                )
 
     @pytest.mark.asyncio
     async def test_self_join_no_welcome(self, app: App):
@@ -316,9 +317,9 @@ class TestMatchers:
                 mock_finish.assert_called_once()
                 assert "已清除" in str(mock_finish.call_args[0][0])
 
-            # 验证图片文件被删除
-            assert not img_path.exists()
-            assert get_group_welcome("10086") is None
+                # 验证图片文件被删除
+                assert not img_path.exists()
+                assert get_group_welcome("10086") is None
 
     @pytest.mark.asyncio
     async def test_set_welcome_image_command(self, app: App, tmp_path):
